@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, viewport-fit=cover">
+    <title>Enhanced Loan Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <img title="Advance-Corp-Transparent" alt="Advance-Corp-Transparent" nitro-lazy-src="https://cdn-ilaefej.nitrocdn.com/nAyVtvoTraASstdeHrVVRsKyxhGLzErd/assets/images/optimized/rev-7b780e9/advancecommercial.co/wp-content/uploads/elementor/thumbs/Advance-Corp-Transparent-qo4oidbuba165zj8ivz7hqeoslmpj847qmhteo6p60.png" class="lazyloaded logo" decoding="async" nitro-lazy-empty="" id="Mjk4OjIzMg==-1" src="https://cdn-ilaefej.nitrocdn.com/nAyVtvoTraASstdeHrVVRsKyxhGLzErd/assets/images/optimized/rev-7b780e9/advancecommercial.co/wp-content/uploads/elementor/thumbs/Advance-Corp-Transparent-qo4oidbuba165zj8ivz7hqeoslmpj847qmhteo6p60.png" width="100" height="100">
+            <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation">
+            <label for="nav-toggle" class="nav-toggle-label">
+                <span>☰</span>
+            </label>
+            <nav class="nav-menu" role="navigation">
+                <a href="home.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="services.html">Services</a>
+                <a href="kitchen-studio.html">Kitchen Studio</a>
+                <a href="store.html">Store</a>
+                <a href="contact-us.html">Contact Us</a>
+                <a href="index.html">Calculator</a>
+            </nav>
+        </div>
+    </header>
+    <div id="loan-tool">
+        <div class="tool-toggle">
+            <button id="prequal-btn" class="active">Pre-Qualification Tool</button>
+            <button id="calculator-btn">Loan Calculator</button>
+        </div>
+        <div id="prequal-form" class="tool-form">
+            <h2>Pre-Qualification Assessment</h2>
+            <label>Number of Income Sources:</label>
+            <input type="number" id="income-sources" min="1" step="1" required>
+            <div id="income-sources-container">
+                <label>Monthly Income for Source 1 ($):</label>
+                <input type="number" class="income-source" min="0" step="0.01" required>
+            </div>
+            <label>Total Monthly Income ($):</label>
+            <input type="number" id="total-income" min="0" step="0.01" readonly>
+            <label>Monthly Expenses ($):</label>
+            <input type="number" id="expenses" min="0" step="0.01" required>
+            <label>Payments for Existing Monthly Debt ($):</label>
+            <input type="number" id="debts" min="0" step="0.01" required>
+            <label>Desired Loan Amount ($):</label>
+            <input type="number" id="loan-amount-prequal" min="0" step="0.01" required>
+            <label>Credit Card Limit ($):</label>
+            <input type="number" id="credit-limit" min="0" step="0.01" required>
+            <label>Number of Dependents:</label>
+            <input type="number" id="dependents" min="0" step="1" required>
+            <button onclick="calculatePrequal()">Assess Eligibility</button>
+            <div id="prequal-result"></div>
+        </div>
+        <div id="calculator-form" class="tool-form hidden">
+            <h2>Loan Calculator</h2>
+            <label>Loan Amount ($):</label>
+            <input type="number" id="loan-amount" min="0" step="0.01" required>
+            <label>Annual Interest Rate (%):</label>
+            <input type="number" id="interest-rate" min="0" step="0.01" required>
+            <label>Loan Term (Years):</label>
+            <input type="number" id="loan-term" min="1" step="1" required>
+            <button onclick="calculateLoan()">Calculate Payment</button>
+            <div id="calculator-result"></div>
+        </div>
+    </div>
+    <footer>
+        <div class="container">
+            <h3>Contact Us</h3>
+            <p>Email: info@advancecommercial.co</p>
+            <p>Phone: (123) 456-7890</p>
+            <p>Address: 123 Business St, City, Country</p>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const prequalBtn = document.getElementById('prequal-btn');
+            const calculatorBtn = document.getElementById('calculator-btn');
+            const prequalForm = document.getElementById('prequal-form');
+            const calculatorForm = document.getElementById('calculator-form');
+            const incomeSourcesInput = document.getElementById('income-sources');
+            const incomeSourcesContainer = document.getElementById('income-sources-container');
+            const totalIncome = document.getElementById('total-income');
+            const navToggle = document.getElementById('nav-toggle');
+            const navLinks = document.querySelectorAll('.nav-menu a');
+
+            prequalBtn.addEventListener('click', () => {
+                prequalBtn.classList.add('bg-blue-600', 'text-white');
+                prequalBtn.classList.remove('bg-gray-200', 'text-gray-800');
+                calculatorBtn.classList.add('bg-gray-200', 'text-gray-800');
+                calculatorBtn.classList.remove('bg-blue-600', 'text-white');
+                prequalForm.classList.remove('hidden');
+                calculatorForm.classList.add('hidden');
+            });
+
+            calculatorBtn.addEventListener('click', () => {
+                calculatorBtn.classList.add('bg-blue-600', 'text-white');
+                calculatorBtn.classList.remove('bg-gray-200', 'text-gray-800');
+                prequalBtn.classList.add('bg-gray-200', 'text-gray-800');
+                prequalBtn.classList.remove('bg-blue-600', 'text-white');
+                calculatorForm.classList.remove('hidden');
+                prequalForm.classList.add('hidden');
+            });
+
+            incomeSourcesInput.addEventListener('input', updateIncomeFields);
+
+            function updateIncomeFields() {
+                const numSources = parseInt(incomeSourcesInput.value) || 1;
+                incomeSourcesContainer.innerHTML = '';
+
+                for (let i = 1; i <= numSources; i++) {
+                    const label = document.createElement('label');
+                    label.textContent = `Monthly Income for Source ${i} ($):`;
+                    label.className = 'font-semibold';
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'income-source';
+                    input.min = '0';
+                    input.step = '0.01';
+                    input.required = true;
+                    input.style.width = '100%';
+                    incomeSourcesContainer.appendChild(label);
+                    incomeSourcesContainer.appendChild(input);
+                }
+
+                const incomeInputs = document.querySelectorAll('.income-source');
+                incomeInputs.forEach(input => {
+                    input.addEventListener('input', updateTotalIncome);
+                });
+
+                updateTotalIncome();
+            }
+
+            function updateTotalIncome() {
+                const incomeInputs = document.querySelectorAll('.income-source');
+                let total = 0;
+                incomeInputs.forEach(input => {
+                    total += parseFloat(input.value) || 0;
+                });
+                totalIncome.value = total.toFixed(2);
+            }
+
+            // Collapse menu on link click
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    navToggle.checked = false;
+                });
+            });
+
+            updateIncomeFields();
+        });
+
+        function calculatePrequal() {
+            const incomeSources = parseInt(document.getElementById('income-sources').value);
+            const totalIncome = parseFloat(document.getElementById('total-income').value);
+            const expenses = parseFloat(document.getElementById('expenses').value);
+            const debts = parseFloat(document.getElementById('debts').value);
+            const loanAmount = parseFloat(document.getElementById('loan-amount-prequal').value);
+            const creditLimit = parseFloat(document.getElementById('credit-limit').value);
+            const dependents = parseInt(document.getElementById('dependents').value);
+            const resultDiv = document.getElementById('prequal-result');
+            const incomeInputs = document.querySelectorAll('.income-source');
+
+            let valid = true;
+            incomeInputs.forEach(input => {
+                if (isNaN(parseFloat(input.value))) valid = false;
+            });
+
+            if (!valid || isNaN(incomeSources) || isNaN(totalIncome) || 
+                isNaN(expenses) || isNaN(debts) || isNaN(loanAmount) || 
+                isNaN(creditLimit) || isNaN(dependents)) {
+                resultDiv.innerHTML = 'Please enter valid numbers for all fields.';
+                return;
+            }
+
+            const dti = ((debts + expenses) / totalIncome) * 100;
+            let status = '';
+            let riskScore = 0;
+
+            riskScore += dependents * 5;
+            riskScore -= incomeSources * 5;
+            if (creditLimit >= 10000) riskScore -= 10;
+            if (loanAmount > totalIncome * 12) riskScore += 10;
+
+            if (dti <= 36 && riskScore <= 10) {
+                status = 'Good - You are likely to qualify for a loan (DTI: ' + dti.toFixed(2) + '%).';
+            } else if (dti <= 43 && riskScore <= 20) {
+                status = 'Moderate - You may qualify for some loans (DTI: ' + dti.toFixed(2) + '%).';
+            } else {
+                status = 'High - Loan qualification may be difficult (DTI: ' + dti.toFixed(2) + '%).';
+            }
+
+            resultDiv.innerHTML = 'Debt-to-Income Ratio: ' + status + ' (Risk Score: ' + riskScore + ')';
+        }
+
+        function calculateLoan() {
+            const amount = parseFloat(document.getElementById('loan-amount').value);
+            const rate = parseFloat(document.getElementById('interest-rate').value) / 100 / 12;
+            const term = parseFloat(document.getElementById('loan-term').value) * 12;
+            const resultDiv = document.getElementById('calculator-result');
+
+            if (isNaN(amount) || isNaN(rate) || isNaN(term)) {
+                resultDiv.innerHTML = 'Please enter valid numbers for all fields.';
+                return;
+            }
+
+            const monthlyPayment = (amount * rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
+            resultDiv.innerHTML = 'Monthly Payment: $' + monthlyPayment.toFixed(2);
+        }
+    </script>
+</body>
+</html>
