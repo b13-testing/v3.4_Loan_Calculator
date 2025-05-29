@@ -72,14 +72,12 @@
             <div id="calculator-result"></div>
         </div>
     </div>
-   <section class="terms-section">
+    <section class="terms-section">
         <div class="container">
             <div class="terms-conditions">
                 <div id="terms-content" class="terms-content">
                     <h4>Terms and Conditions</h4>
-
                     <p>This is a testing version, and a Placeholder for the official terms and conditions</p>
-                    <p>/n</p>
                     <p></p>
                     <p>
                         Welcome to our Loan Tool. By using this tool, you agree to the following terms and conditions:
@@ -279,7 +277,7 @@
         function calculateLoan() {
             const amount = parseFloat(document.getElementById('loan-amount').value);
             const rate = parseFloat(document.getElementById('interest-rate').value) / 100 / 12; // Monthly rate
-            const term = parseFloat(document.getElementById('loan-term').value) * 12; // Total months
+            const term = parseFloat(document.getElementById('loan-term').value); // Total months
             const resultDiv = document.getElementById('calculator-result');
 
             // Validate inputs
